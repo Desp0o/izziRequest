@@ -198,4 +198,10 @@ let api = "http://localhost:3002/post_method"
   }
 ```
 
-### 💡 You can also use the DELETE, PUT, and PATCH methods, just like we had above with the GET and POST methods.
+#### 💡 You can also use the DELETE, PUT, and PATCH methods, just like we had above with the GET and POST methods.
+
+## 🖥️  Installation via Swift Package Manager 
+- **Open your project.**
+- **Go to File → Add Package Dependencies.**
+- **Enter URL: https://github.com/Desp0o/izziRequest.git.**
+- **Click Add Package.**
