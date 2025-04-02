@@ -4,6 +4,8 @@
 
 **IzziRequest** is a super lightweight Swift package that helps you efficiently manage network calls in your application.  
 
+![Static Badge](https://img.shields.io/badge/Swit-6.0-orange) ![Static Badge](https://img.shields.io/badge/iOS-16.6%2B-white) ![Static Badge](https://img.shields.io/badge/Version%20-%201.0.0-skyblue) ![Static Badge](https://img.shields.io/badge/LICENSE-MIT-yellow) ![Static Badge](https://img.shields.io/badge/SPM-SUCCESS-green)
+
 ## Features 🚀  
 - **Flexible code**  
 - **Support for HTTP methods:** GET, POST, PUT, PATCH, DELETE  
@@ -210,6 +212,3 @@ let api = "http://localhost:3002/post_method"
 - **Go to File → Add Package Dependencies.**
 - **Enter URL: https://github.com/Desp0o/izziRequest.git.**
 - **Click Add Package.**
-
-  
-![Static Badge](https://img.shields.io/badge/Swit-6.0-orange) ![Static Badge](https://img.shields.io/badge/iOS-16.6%2B-orange) ![Static Badge](https://img.shields.io/badge/Version%20-%201.0.0-green)
