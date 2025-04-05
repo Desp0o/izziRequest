@@ -11,8 +11,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "IzziRequest",
-            url: "https://github.com/Desp0o/izziRequest/releases/download/v1.1.1/izziRequest.xcframework.zip",
-            checksum: "a71390582f1268526c47b614e084b85ed5fb821dabc455b872c3f537c3c331b6"
+            url: "https://github.com/Desp0o/izziRequest/releases/download/v1.2.0/izziRequest.xcframework.zip",
+            checksum: "1a232b7c97e493fc1640990f4e908cafb28f6848447b9ca061a9ec4636db7a79"
         )
     ]
 )
