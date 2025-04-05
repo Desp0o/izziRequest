@@ -4,7 +4,7 @@
 
 **IzziRequest** is a super lightweight Swift package that helps you efficiently manage network calls in your application.  
 
-![Static Badge](https://img.shields.io/badge/Swit-6.0-orange) ![Static Badge](https://img.shields.io/badge/iOS-16.6%2B-white) ![Static Badge](https://img.shields.io/badge/Version%20-%201.0.0-skyblue) ![Static Badge](https://img.shields.io/badge/LICENSE-MIT-yellow) ![Static Badge](https://img.shields.io/badge/SPM-SUCCESS-green)
+![Static Badge](https://img.shields.io/badge/Swit-6.0-orange) ![Static Badge](https://img.shields.io/badge/iOS-16.6%2B-white) ![Static Badge](https://img.shields.io/badge/Version%20-%202.0.0-skyblue) ![Static Badge](https://img.shields.io/badge/LICENSE-MIT-yellow) ![Static Badge](https://img.shields.io/badge/SPM-SUCCESS-green)
 
 ## Features 🚀  
 - **Flexible code**  
@@ -58,9 +58,9 @@ To start using **IzziRequest**, inject it into your `ViewModel`:
 import izziRequest
 
 final class ViewModel {
-  private let izziReq: IzziRequest
+  private let izziReq: IzziRequestProtocol
   
-  init(izziReq: IzziRequest = IzziRequest()) {
+  init(izziReq: IzziRequestProtocol = IzziRequest()) {
     self.izziReq = izziReq
   }
 }
@@ -71,9 +71,9 @@ final class ViewModel {
 import izziRequest
 
 final class ViewModel {
-  private let izziReq: IzziRequest
+  private let izziReq: IzziRequestProtocol
   
-  init(izziReq: IzziRequest = IzziRequest(defaultTimeout: 60)) {
+  init(izziReq: IzziRequestProtocol = IzziRequest(defaultTimeout: 60)) {
     self.izziReq = izziReq
   }
 }
