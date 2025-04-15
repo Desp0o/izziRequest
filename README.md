@@ -55,7 +55,7 @@ By default, **IzziRequest** has a **timeout interval of 30 seconds** to prevent 
 To start using **IzziRequest**, inject it into your `ViewModel`:  
 
 ```swift
-import izziRequest
+import IzziRequest
 
 final class ViewModel {
   private let izziReq: IzziRequestProtocol
