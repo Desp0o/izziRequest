@@ -3,22 +3,24 @@
 import PackageDescription
 
 let package = Package(
-  name: "izziRequest",
+  name: "IzziRequest", 
   platforms: [
     .iOS(.v15),
     .macOS(.v12)
   ],
   products: [
     .library(
-      name: "izziRequest",
-      targets: ["izziRequest"]),
+      name: "IzziRequest", 
+      targets: ["IzziRequest"]
+    ),
   ],
   targets: [
     .target(
-      name: "izziRequest"),
+      name: "IzziRequest" 
+    ),
     .testTarget(
-      name: "izziRequestTests",
-      dependencies: ["izziRequest"]
+      name: "IzziRequestTests",
+      dependencies: ["IzziRequest"]
     ),
   ]
 )
