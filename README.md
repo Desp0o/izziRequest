@@ -68,7 +68,7 @@ final class ViewModel {
 ⏳ If you want to set a custom timeout interval, you can do it like this:
 
 ```swift
-import izziRequest
+import IzziRequest
 
 final class ViewModel {
   private let izziReq: IzziRequestProtocol
