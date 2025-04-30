@@ -34,7 +34,7 @@ public extension IzziRequestProtocol {
     method: HTTPMethod,
     body: U?,
     useCache: Bool = false,
-    cacheExpiry: TimeInterval = 60
+    cacheExpiry: TimeInterval = 300.0
   ) async throws -> T {
     return try await request(
       urlString: urlString,
@@ -51,7 +51,7 @@ public extension IzziRequestProtocol {
     urlString: String,
     method: HTTPMethod,
     useCache: Bool = false,
-    cacheExpiry: TimeInterval = 60
+    cacheExpiry: TimeInterval = 300.0
   ) async throws -> T {
     return try await request(
       urlString: urlString,
