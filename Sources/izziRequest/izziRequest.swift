@@ -133,7 +133,6 @@ public final class IzziRequest: IzziRequestProtocol {
            Date().timeIntervalSince(responseDate) < cacheExpiry {
           let decoder = JSONDecoder()
           decoder.keyDecodingStrategy = .convertFromSnakeCase
-          print("loaded from data", "🟢")
           return try decoder.decode(T.self, from: cachedResponse.data)
         }
       }
