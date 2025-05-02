@@ -2,15 +2,17 @@
 
 # izziRequest 
 
-**IzziRequest** is a super lightweight Swift package that helps you efficiently manage network calls in your application.  
+**IzziRequest**  is a super lightweight Swift package that helps you efficiently manage network calls in your application. It supports all key aspects of modern networking, including HTTP methods, request bodies, headers, timeout control, and flexible caching.
 
-![Static Badge](https://img.shields.io/badge/Swit-6.0-orange) ![Static Badge](https://img.shields.io/badge/iOS-16.6%2B-white) ![Static Badge](https://img.shields.io/badge/Version%20-%202.0.0-skyblue) ![Static Badge](https://img.shields.io/badge/LICENSE-MIT-yellow) ![Static Badge](https://img.shields.io/badge/SPM-SUCCESS-green)
+![Static Badge](https://img.shields.io/badge/Swit-6.0-orange) ![Static Badge](https://img.shields.io/badge/iOS-16.6%2B-white) ![Static Badge](https://img.shields.io/badge/Version%20-%203.0.0-skyblue) ![Static Badge](https://img.shields.io/badge/LICENSE-MIT-yellow) ![Static Badge](https://img.shields.io/badge/SPM-SUCCESS-green)
 
 ## Features 🚀  
 - **Flexible code**  
 - **Support for HTTP methods:** GET, POST, PUT, PATCH, DELETE  
 - **Customizable timeoutInterval** to prevent the app from freezing  
 - **Supports file upload using multipart requests**  
+- **Caching for GET requests to optimize performance.**
+- **Customizable caching duration.**
 - **Supports auto encoding and decoding to snake_case**  
 - **Well-defined error handling**  
 - **Works with any `Codable` model using generics**  
@@ -20,13 +22,15 @@
 
 ## API Reference
  
-| Parameter        | Type                   | Description                         |
-| :-------------- | :-------------------- | :---------------------------------- |
-| `urlString`     | `String`              | API endpoint URL.     |
-| `method`        | `HTTPMethod`          | HTTP request method.  |
-| `body`          | `Codable`             | Request payload.      |
-| `headers`       | `[String: String]`    | HTTP headers.         |
-| `timeoutInterval` | `TimeInterval`      | Request timeout.      |
+| Parameter         | Type                 | Description                                           | Default |
+|------------------|----------------------|-------------------------------------------------------|---------|
+| `urlString`       | `String`             | API endpoint URL.                                     | N/A     |
+| `method`          | `HTTPMethod`         | HTTP request method.                                  | N/A     |
+| `body`            | `Codable`            | Request payload.                                      | N/A     |
+| `headers`         | `[String: String]`   | HTTP headers.                                         | N/A     |
+| `timeoutInterval` | `TimeInterval`       | Request timeout duration.                             | nil     |
+| `useCache`        | `Bool`               | Enables caching for GET requests.                     | false   |
+| `cacheExpiry`     | `TimeInterval`       | Cache validity duration.                              | 300.0   |
 
 ## 🐍➡️🐪 Auto Encoding & Decoding to Camel Case  
 
@@ -102,7 +106,7 @@ Pass custom headers, such as an authorization token.
 
 ```swift
 let api = "http://localhost:3002/get_method"
-  let headers = ["Authorization" : "Bearer token"]
+let headers = ["Authorization" : "Bearer token"]
   
 func foo() {
     Task {
@@ -125,8 +129,8 @@ Specify a custom timeout interval (e.g., 120 seconds).
 
 ```swift
 let api = "http://localhost:3002/get_method"
-  let headers = ["Authorization" : "Bearer token"]
-  let interval: TimeInterval = 120
+let headers = ["Authorization" : "Bearer token"]
+let interval: TimeInterval = 120
   
 func foo() {
     Task {
@@ -157,8 +161,8 @@ Send a POST request with headers and a request body.
 
 ```swift
 let api = "http://localhost:3002/post_method"
-  let headers = ["Authorization" : "Bearer token"]
-  let reqBody = LoginModel(email: "example@test.com", password: "12345678")
+let headers = ["Authorization" : "Bearer token"]
+let reqBody = LoginModel(email: "example@test.com", password: "12345678")
   
 func foo() {
     Task {
@@ -177,12 +181,12 @@ func foo() {
   }
 
 ```
-🟡 POST Request with Headers, Body, and Custom Timeout
 
+#### 🟡 POST Request with Headers, Body, and Custom Timeout
 Set a custom timeout interval (e.g., 15 seconds).
 
 ```swift
-let api = "http://localhost:3002/post_method"
+  let api = "http://localhost:3002/post_method"
   let headers = ["Authorization" : "Bearer token"]
   let reqBody = LoginModel(email: "example@test.com", password: "12345678")
   let interval: TimeInterval = 15
@@ -205,7 +209,52 @@ let api = "http://localhost:3002/post_method"
   }
 ```
 
-#### 💡 You can also use the DELETE, PUT, and PATCH methods, just like we had above with the GET and POST methods.
+### 💡 You can also use the DELETE, PUT, and PATCH methods, just like we had above with the GET and POST methods.
+
+
+## 💾 Caching
+#### GET method with caching
+use with default cacheExpiry duration (5 minutes)
+``` swift
+  let api = "http://localhost:3002/get_method_with_caching"
+  
+  func foo() {
+    Task {
+      do {
+        let response: MyResponseModel =  try await izziReq.request(
+          urlString: api,
+          method: .GET,
+          useCache: true
+        )
+        print(response)
+      } catch {
+        print(error)
+      }
+    }
+  }
+```
+
+or use with custom cacheExpiry duration
+``` swift
+  let api = "http://localhost:3002/get_method_with_caching"
+  
+  func foo() {
+    Task {
+      do {
+        let response: MyResponseModel =  try await izziReq.request(
+          urlString: api,
+          method: .GET,
+          useCache: true,
+          cacheExpiry: 600.0
+        )
+        print(response)
+      } catch {
+        print(error)
+      }
+    }
+  }
+```
+
 
 ## 🖥️  Installation via Swift Package Manager 
 - **Open your project.**

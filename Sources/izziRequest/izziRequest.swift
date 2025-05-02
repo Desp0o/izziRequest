@@ -5,57 +5,66 @@ import Foundation
 
 @available(macOS 12.0, *)
 @available(iOS 15.0.0, *)
-
 public protocol IzziRequestProtocol {
   func request<T: Codable, U: Codable>(
     urlString: String,
     method: HTTPMethod,
     headers: [String: String]?,
     body: U?,
-    timeoutInterval: TimeInterval?
+    timeoutInterval: TimeInterval?,
+    useCache: Bool,
+    cacheExpiry: TimeInterval
   ) async throws -> T
   
   func request<T: Codable>(
     urlString: String,
     method: HTTPMethod,
     headers: [String: String]?,
-    timeoutInterval: TimeInterval?
+    timeoutInterval: TimeInterval?,
+    useCache: Bool,
+    cacheExpiry: TimeInterval
   ) async throws -> T
 }
 
 @available(macOS 12.0, *)
 @available(iOS 15.0.0, *)
-public extension IzziRequestProtocol{
+public extension IzziRequestProtocol {
   func request<T: Codable, U: Codable>(
     urlString: String,
     method: HTTPMethod,
-    body: U?
+    body: U?,
+    useCache: Bool = false,
+    cacheExpiry: TimeInterval = 300.0
   ) async throws -> T {
     return try await request(
       urlString: urlString,
       method: method,
       headers: nil,
       body: body,
-      timeoutInterval: nil
+      timeoutInterval: nil,
+      useCache: useCache,
+      cacheExpiry: cacheExpiry
     )
   }
   
   func request<T: Codable>(
     urlString: String,
-    method: HTTPMethod
+    method: HTTPMethod,
+    useCache: Bool = false,
+    cacheExpiry: TimeInterval = 300.0
   ) async throws -> T {
     return try await request(
       urlString: urlString,
       method: method,
       headers: nil,
-      timeoutInterval: nil
+      timeoutInterval: nil,
+      useCache: useCache,
+      cacheExpiry: cacheExpiry
     )
   }
 }
 
-
 public final class IzziRequest: IzziRequestProtocol {
-  
   private let defaultTimeout: TimeInterval
   
   public init(defaultTimeout: TimeInterval = 30.0) {
@@ -69,14 +78,18 @@ public final class IzziRequest: IzziRequestProtocol {
       return (fileBody, "application/octet-stream")
     }
     
-    do {
-      let encoder = JSONEncoder()
-      encoder.keyEncodingStrategy = .convertToSnakeCase
-      let jsonData = try encoder.encode(body)
-      return (jsonData, "application/json")
-    } catch {
-      throw IzziRequestErrors.encodingError(error: error)
-    }
+    let encoder = JSONEncoder()
+    encoder.keyEncodingStrategy = .convertToSnakeCase
+    let jsonData = try encoder.encode(body)
+    return (jsonData, "application/json")
+  }
+  
+  private func cacheKey(for request: URLRequest) -> String? {
+    return request.url?.absoluteString
+  }
+  
+  private func currentDateString() -> String {
+    HTTPDateFormatter().string(from: Date())
   }
   
   @available(iOS 15, macOS 12.0, *)
@@ -85,7 +98,9 @@ public final class IzziRequest: IzziRequestProtocol {
     method: HTTPMethod,
     headers: [String: String]? = nil,
     body: U? = nil,
-    timeoutInterval: TimeInterval?
+    timeoutInterval: TimeInterval?,
+    useCache: Bool,
+    cacheExpiry: TimeInterval
   ) async throws -> T {
     guard let url = URL(string: urlString) else {
       throw IzziRequestErrors.invalidURL(url: urlString)
@@ -93,7 +108,6 @@ public final class IzziRequest: IzziRequestProtocol {
     
     var urlRequest = URLRequest(url: url)
     urlRequest.httpMethod = method.rawValue
-    
     urlRequest.timeoutInterval = timeoutInterval ?? defaultTimeout
     
     if let (bodyData, contentType) = try encodeBody(body) {
@@ -102,6 +116,25 @@ public final class IzziRequest: IzziRequestProtocol {
       updatedHeaders["Content-Type"] = contentType
       for (key, value) in updatedHeaders {
         urlRequest.setValue(value, forHTTPHeaderField: key)
+      }
+    } else if let headers = headers {
+      for (key, value) in headers {
+        urlRequest.setValue(value, forHTTPHeaderField: key)
+      }
+    }
+    
+    if useCache, method == .GET {
+      let cache = URLCache.shared
+      if let cachedResponse = cache.cachedResponse(for: urlRequest),
+         let httpResponse = cachedResponse.response as? HTTPURLResponse {
+        
+        if let dateHeader = httpResponse.value(forHTTPHeaderField: "Date"),
+           let responseDate = HTTPDateFormatter().date(from: dateHeader),
+           Date().timeIntervalSince(responseDate) < cacheExpiry {
+          let decoder = JSONDecoder()
+          decoder.keyDecodingStrategy = .convertFromSnakeCase
+          return try decoder.decode(T.self, from: cachedResponse.data)
+        }
       }
     }
     
@@ -116,13 +149,23 @@ public final class IzziRequest: IzziRequestProtocol {
       throw IzziRequestErrors.statusCodeError(statusCode: httpResponse.statusCode, response: responseBody)
     }
     
-    do {
-      let decoder = JSONDecoder()
-      decoder.keyDecodingStrategy = .convertFromSnakeCase
-      return try decoder.decode(T.self, from: data)
-    } catch {
-      throw IzziRequestErrors.decodeError(error: error)
+    if useCache, method == .GET {
+      var newHeaders = (response as? HTTPURLResponse)?.allHeaderFields as? [String: String] ?? [:]
+      newHeaders["Date"] = currentDateString()
+      let modifiedResponse = HTTPURLResponse(
+        url: url,
+        statusCode: httpResponse.statusCode,
+        httpVersion: "HTTP/1.1",
+        headerFields: newHeaders
+      ) ?? httpResponse
+      
+      let cachedResponse = CachedURLResponse(response: modifiedResponse, data: data)
+      URLCache.shared.storeCachedResponse(cachedResponse, for: urlRequest)
     }
+    
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    return try decoder.decode(T.self, from: data)
   }
   
   @available(macOS 12.0, *)
@@ -132,14 +175,18 @@ public final class IzziRequest: IzziRequestProtocol {
     method: HTTPMethod,
     headers: [String: String]? = nil,
     body: U? = nil,
-    timeoutInterval: TimeInterval? = nil
+    timeoutInterval: TimeInterval? = nil,
+    useCache: Bool = false,
+    cacheExpiry: TimeInterval = 60
   ) async throws -> T {
     return try await networkCall(
       urlString: urlString,
       method: method,
       headers: headers,
       body: body,
-      timeoutInterval: timeoutInterval
+      timeoutInterval: timeoutInterval,
+      useCache: useCache,
+      cacheExpiry: cacheExpiry
     )
   }
   
@@ -149,14 +196,31 @@ public final class IzziRequest: IzziRequestProtocol {
     urlString: String,
     method: HTTPMethod,
     headers: [String: String]? = nil,
-    timeoutInterval: TimeInterval? = nil
+    timeoutInterval: TimeInterval? = nil,
+    useCache: Bool = false,
+    cacheExpiry: TimeInterval = 60
   ) async throws -> T {
     return try await networkCall(
       urlString: urlString,
       method: method,
       headers: headers,
       body: Optional<Data>.none,
-      timeoutInterval: timeoutInterval
+      timeoutInterval: timeoutInterval,
+      useCache: useCache,
+      cacheExpiry: cacheExpiry
     )
+  }
+}
+
+final class HTTPDateFormatter: DateFormatter, @unchecked Sendable {
+  override init() {
+    super.init()
+    self.locale = Locale(identifier: "en_US_POSIX")
+    self.timeZone = TimeZone(secondsFromGMT: 0)
+    self.dateFormat = "EEE',' dd MMM yyyy HH':'mm':'ss z"
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
   }
 }
