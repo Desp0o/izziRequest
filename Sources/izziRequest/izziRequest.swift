@@ -48,6 +48,23 @@ public extension IzziRequestProtocol {
   }
   
   func request<T: Codable>(
+      urlString: String,
+      method: HTTPMethod,
+      headers: [String: String]?,
+      useCache: Bool = false,
+      cacheExpiry: TimeInterval = 300.0
+    ) async throws -> T {
+      return try await request(
+        urlString: urlString,
+        method: method,
+        headers: headers,
+        timeoutInterval: nil,
+        useCache: useCache,
+        cacheExpiry: cacheExpiry
+      )
+    }
+  
+  func request<T: Codable>(
     urlString: String,
     method: HTTPMethod,
     useCache: Bool = false,
