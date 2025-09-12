@@ -13,7 +13,8 @@ public protocol IzziRequestProtocol {
     body: U?,
     timeoutInterval: TimeInterval?,
     useCache: Bool,
-    cacheExpiry: TimeInterval
+    cacheExpiry: TimeInterval,
+    convertToCamelcase: Bool
   ) async throws -> T
   
   func request<T: Codable>(
@@ -22,7 +23,8 @@ public protocol IzziRequestProtocol {
     headers: [String: String]?,
     timeoutInterval: TimeInterval?,
     useCache: Bool,
-    cacheExpiry: TimeInterval
+    cacheExpiry: TimeInterval,
+    convertToCamelcase: Bool
   ) async throws -> T
 }
 
@@ -34,7 +36,8 @@ public extension IzziRequestProtocol {
     method: HTTPMethod,
     body: U?,
     useCache: Bool = false,
-    cacheExpiry: TimeInterval = 300.0
+    cacheExpiry: TimeInterval = 300.0,
+    convertToCamelcase: Bool = true
   ) async throws -> T {
     return try await request(
       urlString: urlString,
@@ -43,7 +46,8 @@ public extension IzziRequestProtocol {
       body: body,
       timeoutInterval: nil,
       useCache: useCache,
-      cacheExpiry: cacheExpiry
+      cacheExpiry: cacheExpiry,
+      convertToCamelcase: convertToCamelcase
     )
   }
   
@@ -52,7 +56,8 @@ public extension IzziRequestProtocol {
       method: HTTPMethod,
       headers: [String: String]?,
       useCache: Bool = false,
-      cacheExpiry: TimeInterval = 300.0
+      cacheExpiry: TimeInterval = 300.0,
+      convertToCamelcase: Bool = true
     ) async throws -> T {
       return try await request(
         urlString: urlString,
@@ -60,7 +65,8 @@ public extension IzziRequestProtocol {
         headers: headers,
         timeoutInterval: nil,
         useCache: useCache,
-        cacheExpiry: cacheExpiry
+        cacheExpiry: cacheExpiry,
+        convertToCamelcase: convertToCamelcase
       )
     }
   
@@ -68,7 +74,8 @@ public extension IzziRequestProtocol {
     urlString: String,
     method: HTTPMethod,
     useCache: Bool = false,
-    cacheExpiry: TimeInterval = 300.0
+    cacheExpiry: TimeInterval = 300.0,
+    convertToCamelcase: Bool = true
   ) async throws -> T {
     return try await request(
       urlString: urlString,
@@ -76,18 +83,18 @@ public extension IzziRequestProtocol {
       headers: nil,
       timeoutInterval: nil,
       useCache: useCache,
-      cacheExpiry: cacheExpiry
+      cacheExpiry: cacheExpiry,
+      convertToCamelcase: convertToCamelcase
     )
   }
 }
 
 public final class IzziRequest: IzziRequestProtocol {
   private let defaultTimeout: TimeInterval
-  private let convertToCamelcase: Bool
+
   
-  public init(defaultTimeout: TimeInterval = 30.0, convertToCamelcase: Bool = true) {
+  public init(defaultTimeout: TimeInterval = 30.0) {
     self.defaultTimeout = defaultTimeout
-    self.convertToCamelcase = convertToCamelcase
   }
   
   private func encodeBody<U: Encodable>(_ body: U?) throws -> (Data?, String)? {
@@ -119,7 +126,8 @@ public final class IzziRequest: IzziRequestProtocol {
     body: U? = nil,
     timeoutInterval: TimeInterval?,
     useCache: Bool,
-    cacheExpiry: TimeInterval
+    cacheExpiry: TimeInterval,
+    convertToCamelcase: Bool
   ) async throws -> T {
     guard let url = URL(string: urlString) else {
       throw IzziRequestErrors.invalidURL(url: urlString)
@@ -196,7 +204,8 @@ public final class IzziRequest: IzziRequestProtocol {
     body: U? = nil,
     timeoutInterval: TimeInterval? = nil,
     useCache: Bool = false,
-    cacheExpiry: TimeInterval = 60
+    cacheExpiry: TimeInterval = 60,
+    convertToCamelcase: Bool = true
   ) async throws -> T {
     return try await networkCall(
       urlString: urlString,
@@ -205,7 +214,8 @@ public final class IzziRequest: IzziRequestProtocol {
       body: body,
       timeoutInterval: timeoutInterval,
       useCache: useCache,
-      cacheExpiry: cacheExpiry
+      cacheExpiry: cacheExpiry,
+      convertToCamelcase: convertToCamelcase
     )
   }
   
@@ -217,7 +227,8 @@ public final class IzziRequest: IzziRequestProtocol {
     headers: [String: String]? = nil,
     timeoutInterval: TimeInterval? = nil,
     useCache: Bool = false,
-    cacheExpiry: TimeInterval = 60
+    cacheExpiry: TimeInterval = 60,
+    convertToCamelcase: Bool = true
   ) async throws -> T {
     return try await networkCall(
       urlString: urlString,
@@ -226,7 +237,8 @@ public final class IzziRequest: IzziRequestProtocol {
       body: Optional<Data>.none,
       timeoutInterval: timeoutInterval,
       useCache: useCache,
-      cacheExpiry: cacheExpiry
+      cacheExpiry: cacheExpiry,
+      convertToCamelcase: convertToCamelcase
     )
   }
 }
