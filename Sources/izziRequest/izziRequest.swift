@@ -83,9 +83,11 @@ public extension IzziRequestProtocol {
 
 public final class IzziRequest: IzziRequestProtocol {
   private let defaultTimeout: TimeInterval
+  private let convertToCamelcase: Bool
   
-  public init(defaultTimeout: TimeInterval = 30.0) {
+  public init(defaultTimeout: TimeInterval = 30.0, convertToCamelcase: Bool = true) {
     self.defaultTimeout = defaultTimeout
+    self.convertToCamelcase = convertToCamelcase
   }
   
   private func encodeBody<U: Encodable>(_ body: U?) throws -> (Data?, String)? {
@@ -149,7 +151,7 @@ public final class IzziRequest: IzziRequestProtocol {
            let responseDate = HTTPDateFormatter().date(from: dateHeader),
            Date().timeIntervalSince(responseDate) < cacheExpiry {
           let decoder = JSONDecoder()
-          decoder.keyDecodingStrategy = .convertFromSnakeCase
+          decoder.keyDecodingStrategy = convertToCamelcase ? .convertFromSnakeCase : .useDefaultKeys
           return try decoder.decode(T.self, from: cachedResponse.data)
         }
       }
@@ -181,7 +183,7 @@ public final class IzziRequest: IzziRequestProtocol {
     }
     
     let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    decoder.keyDecodingStrategy = convertToCamelcase ? .convertFromSnakeCase : .useDefaultKeys
     return try decoder.decode(T.self, from: data)
   }
   

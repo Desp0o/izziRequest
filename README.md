@@ -30,6 +30,7 @@
 | `headers`         | `[String: String]`   | HTTP headers.                                         | N/A     |
 | `timeoutInterval` | `TimeInterval`       | Request timeout duration.                             | nil     |
 | `useCache`        | `Bool`               | Enables caching for GET requests.                     | false   |
+| `convertToCamelcase`        | `Bool`               | Enables conversion of JSON keys from snake_case to camelCase during decoding.                     | true   |
 | `cacheExpiry`     | `TimeInterval`       | Cache validity duration.                              | 300.0   |
 
 ## 🐍➡️🐪 Auto Encoding & Decoding to Camel Case  
