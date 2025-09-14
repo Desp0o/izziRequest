@@ -4,7 +4,7 @@
 
 **IzziRequest**  is a super lightweight Swift package that helps you efficiently manage network calls in your application. It supports all key aspects of modern networking, including HTTP methods, request bodies, headers, timeout control, and flexible caching.
 
-![Static Badge](https://img.shields.io/badge/Swit-6.0-orange) ![Static Badge](https://img.shields.io/badge/iOS-16.6%2B-white) ![Static Badge](https://img.shields.io/badge/Version%20-%203.0.0-skyblue) ![Static Badge](https://img.shields.io/badge/LICENSE-MIT-yellow) ![Static Badge](https://img.shields.io/badge/SPM-SUCCESS-green)
+![Static Badge](https://img.shields.io/badge/Swit-6.0-orange) ![Static Badge](https://img.shields.io/badge/iOS-16.6%2B-white) ![Static Badge](https://img.shields.io/badge/Version%20-%203.2.0-skyblue) ![Static Badge](https://img.shields.io/badge/LICENSE-MIT-yellow) ![Static Badge](https://img.shields.io/badge/SPM-SUCCESS-green)
 
 ## Features 🚀  
 - **Flexible code**  
